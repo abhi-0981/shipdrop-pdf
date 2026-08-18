@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ShipDrop PDF Tool</title>
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+    <div class="card">
+
+        <h1>ShipDrop PDF Tool</h1>
+
+        <form
+            id="upload-form"
+            action="/upload"
+            method="POST"
+            enctype="multipart/form-data">
+
+            <label class="upload-box">
+
+                Upload PDF
+
+                <input
+                    type="file"
+                    id="pdf"
+                    name="pdf"
+                    accept=".pdf"
+                    hidden>
+
+                <span id="pdf-name">
+
+                    No PDF selected
+
+                </span>
+
+            </label>
+
+            <label class="upload-box">
+
+              
+
+                <input
+                    type="file"
+                    id="left_logo"
+                    name="left_logo"
+                    accept=".png,.jpg,.jpeg"
+                    hidden>
+
+                <span id="logo-name">
+
+                      Upload Party Logo (Optional)
+
+                </span>
+
+            </label>
+
+            <button
+                id="replace-btn"
+                type="submit"
+                disabled>
+
+                Replace Logo
+
+            </button>
+
+        </form>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+
+</html>
