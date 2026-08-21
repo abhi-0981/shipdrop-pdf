@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, send_file
 import fitz
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -11,7 +12,7 @@ RIGHT_LOGO_FILE = "logo.png"
 RIGHT_COVER_RECT = fitz.Rect(235, 10, 300, 45)
 RIGHT_LOGO_RECT = fitz.Rect(137, 12, 310, 44)
 
-# Left logo coordinates (adjust kar sakta hai)
+# Left logo coordinates
 LEFT_COVER_RECT = fitz.Rect(5, 5, 150, 48)
 LEFT_LOGO_RECT = fitz.Rect(5, 5, 150, 48)
 
@@ -34,7 +35,11 @@ def upload():
     if not pdf_file:
         return "Please select a PDF."
 
-    original_filename = pdf_file.filename
+    # Current date
+    current_date = datetime.now().strftime("%d-%m-%Y")
+
+    # Output filename
+    download_filename = f"ShipDrop-Label-{current_date}.pdf"
 
     input_pdf = "temp.pdf"
     output_pdf = "output.pdf"
@@ -52,7 +57,9 @@ def upload():
 
     for page in pdf:
 
-        # Right logo replace
+        # =========================
+        # RIGHT LOGO REPLACE
+        # =========================
 
         page.draw_rect(
             RIGHT_COVER_RECT,
@@ -67,7 +74,10 @@ def upload():
             overlay=True
         )
 
-        # Left logo replace (optional)
+        # =========================
+        # LEFT LOGO REPLACE
+        # OPTIONAL
+        # =========================
 
         if left_logo_path:
 
@@ -84,7 +94,9 @@ def upload():
                 overlay=True
             )
 
-        # Phone number replace
+        # =========================
+        # PHONE NUMBER REPLACE
+        # =========================
 
         matches = page.search_for(OLD_PHONE)
 
@@ -103,11 +115,18 @@ def upload():
             page.apply_redactions()
 
             page.insert_text(
-                fitz.Point(rect.x0, rect.y1 - 2),
+                fitz.Point(
+                    rect.x0,
+                    rect.y1 - 2
+                ),
                 NEW_PHONE,
                 fontsize=6.5,
                 fontname="Times-Roman"
             )
+
+    # =========================
+    # SAVE OPTIMIZED PDF
+    # =========================
 
     pdf.save(
         output_pdf,
@@ -118,16 +137,22 @@ def upload():
 
     pdf.close()
 
+    # Delete temporary input
     if os.path.exists(input_pdf):
         os.remove(input_pdf)
 
+    # Delete temporary left logo
     if left_logo_path and os.path.exists(left_logo_path):
         os.remove(left_logo_path)
+
+    # =========================
+    # DOWNLOAD
+    # =========================
 
     return send_file(
         output_pdf,
         as_attachment=True,
-        download_name=original_filename
+        download_name=download_filename
     )
 
 
