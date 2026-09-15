@@ -1,160 +1,289 @@
 from flask import Flask, render_template, request, send_file
 import fitz
 import os
+import tempfile
 from datetime import datetime
 
 app = Flask(__name__)
 
-# Right logo (fixed)
+# =========================================================
+# FIXED RIGHT LOGO
+# =========================================================
+
 RIGHT_LOGO_FILE = "logo.png"
 
-# Right logo coordinates
 RIGHT_COVER_RECT = fitz.Rect(235, 10, 300, 45)
 RIGHT_LOGO_RECT = fitz.Rect(137, 12, 310, 44)
 
-# Left logo coordinates
+
+# =========================================================
+# OPTIONAL LEFT LOGO
+# =========================================================
+
 LEFT_COVER_RECT = fitz.Rect(5, 5, 150, 48)
 LEFT_LOGO_RECT = fitz.Rect(5, 5, 150, 48)
 
-# Phone number
+
+# =========================================================
+# PHONE NUMBER
+# =========================================================
+
 OLD_PHONE = "8766066070, 0141-4797120"
 NEW_PHONE = "+91-9116012366"
 
+
+# =========================================================
+# HOME
+# =========================================================
 
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
+# =========================================================
+# UPLOAD + PROCESS MULTIPLE PDFS
+# =========================================================
+
 @app.route("/upload", methods=["POST"])
 def upload():
 
-    pdf_file = request.files.get("pdf")
+    # Get ALL selected PDFs
+    pdf_files = request.files.getlist("pdf")
+
+    # Optional left logo
     left_logo = request.files.get("left_logo")
 
-    if not pdf_file:
-        return "Please select a PDF."
+    # -----------------------------------------------------
+    # Validate PDF
+    # -----------------------------------------------------
 
-    # Current date
-    current_date = datetime.now().strftime("%d-%m-%Y")
+    pdf_files = [
+        pdf_file
+        for pdf_file in pdf_files
+        if pdf_file and pdf_file.filename
+    ]
 
-    # Output filename
-    download_filename = f"ShipDrop-Label-{current_date}.pdf"
+    if not pdf_files:
+        return "Please select at least one PDF.", 400
 
-    input_pdf = "temp.pdf"
-    output_pdf = "output.pdf"
 
-    pdf_file.save(input_pdf)
+    # -----------------------------------------------------
+    # Optional left logo
+    # -----------------------------------------------------
 
-    left_logo_path = None
+    left_logo_data = None
 
     if left_logo and left_logo.filename:
+        left_logo_data = left_logo.read()
 
-        left_logo_path = "left_logo.png"
-        left_logo.save(left_logo_path)
 
-    pdf = fitz.open(input_pdf)
+    # -----------------------------------------------------
+    # Create one final PDF
+    # -----------------------------------------------------
 
-    for page in pdf:
+    final_pdf = fitz.open()
 
-        # =========================
-        # RIGHT LOGO REPLACE
-        # =========================
 
-        page.draw_rect(
-            RIGHT_COVER_RECT,
-            fill=(1, 1, 1),
-            width=0
+    try:
+
+        # =================================================
+        # PROCESS EACH PDF
+        # =================================================
+
+        for pdf_file in pdf_files:
+
+            # Read uploaded PDF directly into memory
+            pdf_data = pdf_file.read()
+
+            if not pdf_data:
+                continue
+
+            source_pdf = fitz.open(
+                stream=pdf_data,
+                filetype="pdf"
+            )
+
+
+            # =============================================
+            # PROCESS EACH PAGE
+            # =============================================
+
+            for page in source_pdf:
+
+                # -----------------------------------------
+                # RIGHT LOGO REPLACE
+                # -----------------------------------------
+
+                page.draw_rect(
+                    RIGHT_COVER_RECT,
+                    fill=(1, 1, 1),
+                    width=0
+                )
+
+                page.insert_image(
+                    RIGHT_LOGO_RECT,
+                    filename=RIGHT_LOGO_FILE,
+                    keep_proportion=True,
+                    overlay=True
+                )
+
+
+                # -----------------------------------------
+                # OPTIONAL LEFT LOGO
+                # -----------------------------------------
+
+                if left_logo_data:
+
+                    page.draw_rect(
+                        LEFT_COVER_RECT,
+                        fill=(1, 1, 1),
+                        width=0
+                    )
+
+                    page.insert_image(
+                        LEFT_LOGO_RECT,
+                        stream=left_logo_data,
+                        keep_proportion=True,
+                        overlay=True
+                    )
+
+
+                # -----------------------------------------
+                # PHONE NUMBER REPLACE
+                # -----------------------------------------
+
+                matches = page.search_for(OLD_PHONE)
+
+                for rect in matches:
+
+                    redact_rect = fitz.Rect(
+                        rect.x0,
+                        rect.y0,
+                        rect.x1,
+                        rect.y1 - 2
+                    )
+
+                    page.add_redact_annot(
+                        redact_rect,
+                        fill=(1, 1, 1)
+                    )
+
+                    page.apply_redactions()
+
+                    page.insert_text(
+                        fitz.Point(
+                            rect.x0,
+                            rect.y1 - 2
+                        ),
+                        NEW_PHONE,
+                        fontsize=6.5,
+                        fontname="Times-Roman"
+                    )
+
+
+            # =============================================
+            # ADD THIS PDF'S PAGES TO FINAL PDF
+            # =============================================
+
+            final_pdf.insert_pdf(source_pdf)
+
+            source_pdf.close()
+
+
+        # =================================================
+        # CHECK RESULT
+        # =================================================
+
+        if final_pdf.page_count == 0:
+            final_pdf.close()
+            return "No valid PDF pages found.", 400
+
+
+        # =================================================
+        # CURRENT DATE
+        # =================================================
+
+        current_date = datetime.now().strftime("%d-%m-%Y")
+
+        download_filename = (
+            f"ShipDrop-Label-{current_date}.pdf"
         )
 
-        page.insert_image(
-            RIGHT_LOGO_RECT,
-            filename=RIGHT_LOGO_FILE,
-            keep_proportion=True,
-            overlay=True
+
+        # =================================================
+        # TEMPORARY OUTPUT FILE
+        # =================================================
+
+        temp_output = tempfile.NamedTemporaryFile(
+            delete=False,
+            suffix=".pdf"
         )
 
-        # =========================
-        # LEFT LOGO REPLACE
-        # OPTIONAL
-        # =========================
+        output_path = temp_output.name
 
-        if left_logo_path:
+        temp_output.close()
 
-            page.draw_rect(
-                LEFT_COVER_RECT,
-                fill=(1, 1, 1),
-                width=0
-            )
 
-            page.insert_image(
-                LEFT_LOGO_RECT,
-                filename=left_logo_path,
-                keep_proportion=True,
-                overlay=True
-            )
+        # =================================================
+        # SAVE FINAL MERGED PDF
+        # =================================================
 
-        # =========================
-        # PHONE NUMBER REPLACE
-        # =========================
+        final_pdf.save(
+            output_path,
+            garbage=4,
+            deflate=True,
+            clean=True
+        )
 
-        matches = page.search_for(OLD_PHONE)
+        final_pdf.close()
 
-        for rect in matches:
 
-            page.add_redact_annot(
-                fitz.Rect(
-                    rect.x0,
-                    rect.y0,
-                    rect.x1,
-                    rect.y1 - 2
-                ),
-                fill=(1, 1, 1)
-            )
+        # =================================================
+        # SEND SINGLE PDF
+        # =================================================
 
-            page.apply_redactions()
+        response = send_file(
+            output_path,
+            as_attachment=True,
+            download_name=download_filename,
+            mimetype="application/pdf"
+        )
 
-            page.insert_text(
-                fitz.Point(
-                    rect.x0,
-                    rect.y1 - 2
-                ),
-                NEW_PHONE,
-                fontsize=6.5,
-                fontname="Times-Roman"
-            )
 
-    # =========================
-    # SAVE OPTIMIZED PDF
-    # =========================
+        # Delete temporary file after response
+        @response.call_on_close
+        def cleanup():
 
-    pdf.save(
-        output_pdf,
-        garbage=4,
-        deflate=True,
-        clean=True
-    )
+            if os.path.exists(output_path):
 
-    pdf.close()
+                try:
+                    os.remove(output_path)
 
-    # Delete temporary input
-    if os.path.exists(input_pdf):
-        os.remove(input_pdf)
+                except Exception:
+                    pass
 
-    # Delete temporary left logo
-    if left_logo_path and os.path.exists(left_logo_path):
-        os.remove(left_logo_path)
 
-    # =========================
-    # DOWNLOAD
-    # =========================
+        return response
 
-    return send_file(
-        output_pdf,
-        as_attachment=True,
-        download_name=download_filename
-    )
 
+    except Exception as e:
+
+        try:
+            final_pdf.close()
+        except Exception:
+            pass
+
+        return f"Error processing PDF: {str(e)}", 500
+
+
+# =========================================================
+# RUN
+# =========================================================
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000)),
+        debug=True
+    )

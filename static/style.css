@@ -1,6 +1,9 @@
 * {
+
     margin: 0;
+
     padding: 0;
+
     box-sizing: border-box;
 }
 
@@ -14,16 +17,16 @@ body {
 
     align-items: center;
 
+    padding: 20px;
+
     font-family: Arial, sans-serif;
 
-    background: linear-gradient(135deg,
-            #141e30,
-            #243b55);
+    background: linear-gradient(135deg, #141e30, #243b55);
 }
 
 .card {
 
-    width: 500px;
+    width: 550px;
 
     padding: 45px;
 
@@ -38,9 +41,14 @@ body {
 
 .logo {
 
-    font-size: 70px;
-
     margin-bottom: 20px;
+}
+
+.logo img {
+
+    width: 220px;
+
+    height: auto;
 }
 
 h1 {
@@ -59,7 +67,7 @@ p {
 
     display: block;
 
-    padding: 45px 20px;
+    padding: 35px 20px;
 
     border: 3px dashed #d6d6d6;
 
@@ -69,17 +77,19 @@ p {
 
     transition: 0.3s;
 
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .upload-box:hover {
 
     transform: translateY(-5px);
+
+    border-color: #dd2476;
 }
 
 .upload-box i {
 
-    font-size: 45px;
+    font-size: 40px;
 
     margin-bottom: 15px;
 }
@@ -89,7 +99,8 @@ p {
     margin-bottom: 10px;
 }
 
-#file-name {
+#pdf-name,
+#logo-name {
 
     color: #777;
 
@@ -100,7 +111,7 @@ button {
 
     width: 100%;
 
-    padding: 16px;
+    padding: 18px;
 
     border: none;
 
@@ -112,9 +123,7 @@ button {
 
     color: white;
 
-    background: linear-gradient(135deg,
-            #ff512f,
-            #dd2476);
+    background: linear-gradient(135deg, #ff512f, #dd2476);
 
     cursor: pointer;
 
@@ -122,70 +131,7 @@ button {
 }
 
 button:hover:not(:disabled) {
-body {
 
-    min-height: 100vh;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    font-family: Arial, sans-serif;
-
-    background: #141e30;
-}
-
-.card {
-
-    width: 500px;
-
-    background: white;
-
-    padding: 40px;
-
-    border-radius: 20px;
-
-    text-align: center;
-}
-
-.upload-box {
-
-    display: block;
-
-    padding: 25px;
-
-    border: 2px dashed gray;
-
-    margin: 20px 0;
-
-    border-radius: 15px;
-
-    cursor: pointer;
-}
-
-button {
-
-    width: 100%;
-
-    padding: 15px;
-
-    border: none;
-
-    border-radius: 10px;
-
-    color: white;
-
-    background: #dd2476;
-
-    cursor: pointer;
-}
-
-button:disabled {
-
-    background: gray;
-}
     transform: translateY(-3px);
 }
 

@@ -1,24 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>ShipDrop PDF Tool</title>
 
     <link rel="stylesheet"
-        href="{{ url_for('static', filename='style.css') }}">
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
 
 </head>
+
 
 <body>
 
     <div class="card">
 
+        <!-- ============================= -->
+        <!-- TOP LOGO -->
+        <!-- ============================= -->
+
+        <div class="top-logo">
+
+            <img
+                src="{{ url_for('static', filename='logo.png') }}"
+                alt="ShipDrop">
+
+        </div>
+
+
+        <!-- ============================= -->
+        <!-- HEADING -->
+        <!-- ============================= -->
+
         <h1>ShipDrop PDF Tool</h1>
+
+        <p>
+            Replace courier logos and phone numbers in seconds.
+        </p>
+
+
+        <!-- ============================= -->
+        <!-- FORM -->
+        <!-- ============================= -->
 
         <form
             id="upload-form"
@@ -26,56 +57,81 @@
             method="POST"
             enctype="multipart/form-data">
 
-            <label class="upload-box">
 
-                Upload PDF
+            <!-- ============================= -->
+            <!-- PDF UPLOAD -->
+            <!-- ============================= -->
 
-                <input
-                    type="file"
-                    id="pdf"
-                    name="pdf"
-                    accept=".pdf"
-                    hidden>
+            <label
+                class="upload-box"
+                for="pdf">
+
+                <i class="fa-solid fa-file-pdf"></i>
+
+                <h3>Upload PDF</h3>
 
                 <span id="pdf-name">
-
-                    No PDF selected
-
+                    Select one or multiple PDFs
                 </span>
 
             </label>
 
-            <label class="upload-box">
 
-              
+            <input
+                type="file"
+                id="pdf"
+                name="pdf"
+                accept=".pdf,application/pdf"
+                multiple
+                hidden>
 
-                <input
-                    type="file"
-                    id="left_logo"
-                    name="left_logo"
-                    accept=".png,.jpg,.jpeg"
-                    hidden>
+
+            <!-- ============================= -->
+            <!-- LEFT LOGO -->
+            <!-- ============================= -->
+
+            <label
+                class="upload-box"
+                for="left_logo">
+
+                <i class="fa-solid fa-image"></i>
+
+                <h3>Upload Left Logo</h3>
 
                 <span id="logo-name">
-
-                      Upload Party Logo (Optional)
-
+                    Optional — existing logo will remain
                 </span>
 
             </label>
+
+
+            <input
+                type="file"
+                id="left_logo"
+                name="left_logo"
+                accept="image/png,image/jpeg,image/jpg"
+                hidden>
+
+
+            <!-- ============================= -->
+            <!-- BUTTON -->
+            <!-- ============================= -->
 
             <button
                 id="replace-btn"
                 type="submit"
                 disabled>
 
-                Replace Logo
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+                Replace & Download
 
             </button>
 
         </form>
 
     </div>
+
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 
