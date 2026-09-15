@@ -6,134 +6,148 @@
     <meta charset="UTF-8">
 
     <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+        content="width=device-width, initial-scale=1.0">
 
     <title>ShipDrop PDF Tool</title>
 
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+        href="{{ url_for('static', filename='style.css') }}">
 
 </head>
 
-
 <body>
 
-    <div class="card">
+    <div class="page">
 
-        <!-- ============================= -->
-        <!-- TOP LOGO -->
-        <!-- ============================= -->
+        <div class="card">
 
-        <div class="top-logo">
+            <!-- Header -->
+            <div class="header">
 
-            <img
-                src="{{ url_for('static', filename='logo.png') }}"
-                alt="ShipDrop">
+                <div class="header-icon">
+                    <i class="fa-solid fa-file-pdf"></i>
+                </div>
+
+                <h1>ShipDrop PDF Tool</h1>
+
+                <p>
+                    Replace courier logos and phone numbers in seconds.
+                </p>
+
+            </div>
+
+
+            <form
+                id="upload-form"
+                action="/upload"
+                method="POST"
+                enctype="multipart/form-data">
+
+
+                <!-- PDF Upload -->
+                <label
+                    class="upload-box"
+                    for="pdf">
+
+                    <div class="upload-icon">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </div>
+
+                    <h3>
+                        Upload PDF
+                    </h3>
+
+                    <span id="pdf-name">
+                        Select one or multiple PDFs
+                    </span>
+
+                </label>
+
+                <input
+                    type="file"
+                    id="pdf"
+                    name="pdf"
+                    accept=".pdf"
+                    multiple
+                    hidden>
+
+
+                <!-- Selected PDF List -->
+                <div
+                    id="pdf-list"
+                    class="file-list">
+                </div>
+
+
+                <!-- Left Logo -->
+                <label
+                    class="upload-box logo-upload"
+                    for="left_logo">
+
+                    <div class="upload-icon image-icon">
+                        <i class="fa-solid fa-image"></i>
+                    </div>
+
+                    <h3>
+                        Upload Left Logo
+                        <span class="optional">(Optional)</span>
+                    </h3>
+
+                    <span id="logo-name">
+                        Existing logo will remain
+                    </span>
+
+                </label>
+
+                <input
+                    type="file"
+                    id="left_logo"
+                    name="left_logo"
+                    accept="image/png,image/jpeg,image/jpg"
+                    hidden>
+
+
+                <!-- Button -->
+                <button
+                    id="replace-btn"
+                    type="submit"
+                    disabled>
+
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+                    <span>Replace & Download</span>
+
+                </button>
+
+
+                <!-- Status -->
+                <div
+                    id="status"
+                    class="status">
+                </div>
+
+            </form>
+
+
+            <div class="footer">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+                Your files are processed securely.
+
+            </div>
 
         </div>
-
-
-        <!-- ============================= -->
-        <!-- HEADING -->
-        <!-- ============================= -->
-
-        <h1>ShipDrop PDF Tool</h1>
-
-        <p>
-            Replace courier logos and phone numbers in seconds.
-        </p>
-
-
-        <!-- ============================= -->
-        <!-- FORM -->
-        <!-- ============================= -->
-
-        <form
-            id="upload-form"
-            action="/upload"
-            method="POST"
-            enctype="multipart/form-data">
-
-
-            <!-- ============================= -->
-            <!-- PDF UPLOAD -->
-            <!-- ============================= -->
-
-            <label
-                class="upload-box"
-                for="pdf">
-
-                <i class="fa-solid fa-file-pdf"></i>
-
-                <h3>Upload PDF</h3>
-
-                <span id="pdf-name">
-                    Select one or multiple PDFs
-                </span>
-
-            </label>
-
-
-            <input
-                type="file"
-                id="pdf"
-                name="pdf"
-                accept=".pdf,application/pdf"
-                multiple
-                hidden>
-
-
-            <!-- ============================= -->
-            <!-- LEFT LOGO -->
-            <!-- ============================= -->
-
-            <label
-                class="upload-box"
-                for="left_logo">
-
-                <i class="fa-solid fa-image"></i>
-
-                <h3>Upload Left Logo</h3>
-
-                <span id="logo-name">
-                    Optional — existing logo will remain
-                </span>
-
-            </label>
-
-
-            <input
-                type="file"
-                id="left_logo"
-                name="left_logo"
-                accept="image/png,image/jpeg,image/jpg"
-                hidden>
-
-
-            <!-- ============================= -->
-            <!-- BUTTON -->
-            <!-- ============================= -->
-
-            <button
-                id="replace-btn"
-                type="submit"
-                disabled>
-
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-
-                Replace & Download
-
-            </button>
-
-        </form>
 
     </div>
 
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script
+        src="{{ url_for('static', filename='script.js') }}">
+    </script>
 
 </body>
 

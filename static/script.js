@@ -16,16 +16,26 @@ const button =
 const form =
     document.getElementById("upload-form");
 
+const pdfList =
+    document.getElementById("pdf-list");
 
-// ======================================================
-// PDF SELECTION
-// ======================================================
+const status =
+    document.getElementById("status");
+
+
+/* ================================
+   PDF SELECT
+================================ */
 
 pdf.addEventListener("change", () => {
 
     if (pdf.files.length > 0) {
 
-        const count = pdf.files.length;
+        const count =
+            pdf.files.length;
+
+
+        /* Main text */
 
         if (count === 1) {
 
@@ -39,22 +49,69 @@ pdf.addEventListener("change", () => {
 
         }
 
+
+        /* Enable button */
+
         button.disabled = false;
 
-    } else {
 
-        pdfName.textContent =
-            "Select one or multiple PDFs";
+        /* Clear old list */
 
-        button.disabled = true;
+        pdfList.innerHTML = "";
+
+
+        /* Count */
+
+        const countText =
+            document.createElement("div");
+
+        countText.className =
+            "file-count";
+
+        countText.textContent =
+            `${count} PDF${count > 1 ? "s" : ""} selected`;
+
+        pdfList.appendChild(countText);
+
+
+        /* File names */
+
+        Array.from(pdf.files).forEach(
+            (file) => {
+
+                const item =
+                    document.createElement("div");
+
+                item.className =
+                    "file-item";
+
+                item.innerHTML = `
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span>${file.name}</span>
+                `;
+
+                pdfList.appendChild(item);
+
+            }
+        );
+
+
+        pdfList.classList.add("show");
+
+    }
+
+    else {
+
+        resetPDF();
+
     }
 
 });
 
 
-// ======================================================
-// LEFT LOGO SELECTION
-// ======================================================
+/* ================================
+   LEFT LOGO SELECT
+================================ */
 
 leftLogo.addEventListener("change", () => {
 
@@ -63,51 +120,93 @@ leftLogo.addEventListener("change", () => {
         logoName.textContent =
             leftLogo.files[0].name;
 
-    } else {
+    }
+
+    else {
 
         logoName.textContent =
-            "Optional — existing logo will remain";
+            "Existing logo will remain";
 
     }
 
 });
 
 
-// ======================================================
-// FORM SUBMIT
-// ======================================================
+/* ================================
+   FORM SUBMIT
+================================ */
 
 form.addEventListener("submit", () => {
 
-    // Disable button while processing
     button.disabled = true;
 
     button.innerHTML = `
         <i class="fa-solid fa-spinner fa-spin"></i>
-        Processing PDFs...
+        <span>Processing PDF...</span>
     `;
 
 
-    // Clear selected files shortly after submit
+    status.textContent =
+        "Please wait while your PDF is being processed...";
+
+    status.classList.add("show");
+
+
+    /*
+       Browser download complete hone ke
+       baad input clear karne ke liye
+       thoda delay.
+    */
+
     setTimeout(() => {
 
-        pdf.value = "";
+        resetPDF();
 
-        leftLogo.value = "";
-
-        pdfName.textContent =
-            "Select one or multiple PDFs";
-
-        logoName.textContent =
-            "Optional — existing logo will remain";
-
-        button.innerHTML = `
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-            Replace & Download
-        `;
+        resetLogo();
 
         button.disabled = true;
 
-    }, 1000);
+        button.innerHTML = `
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Replace & Download</span>
+        `;
+
+        status.textContent = "";
+
+        status.classList.remove("show");
+
+    }, 1500);
 
 });
+
+
+/* ================================
+   RESET PDF
+================================ */
+
+function resetPDF() {
+
+    pdf.value = "";
+
+    pdfName.textContent =
+        "Select one or multiple PDFs";
+
+    pdfList.innerHTML = "";
+
+    pdfList.classList.remove("show");
+
+}
+
+
+/* ================================
+   RESET LOGO
+================================ */
+
+function resetLogo() {
+
+    leftLogo.value = "";
+
+    logoName.textContent =
+        "Existing logo will remain";
+
+}
