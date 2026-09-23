@@ -13,7 +13,7 @@ app = Flask(__name__)
 RIGHT_LOGO_FILE = "logo.png"
 
 RIGHT_COVER_RECT = fitz.Rect(235, 10, 300, 45)
-RIGHT_LOGO_RECT = fitz.Rect(137, 12, 310, 44)
+RIGHT_LOGO_RECT = fitz.Rect(137, 32, 310, 44)
 
 
 # =========================================================
