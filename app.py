@@ -206,7 +206,7 @@ def upload():
         current_date = datetime.now().strftime("%d-%m-%Y")
 
         download_filename = (
-            f"ShipDrop-Label-{current_date}.pdf"
+            f"ParcelDrop-Label-{current_date}.pdf"
         )
 
 
